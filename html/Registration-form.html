@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Registration - Play2Learn</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f7f8;
+        margin: 0;
+        padding: 0;
+      }
+
+      .registration-container {
+        max-width: 600px;
+        margin: 60px auto;
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #0b2a3a;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background: #0b2a3a;
+        color: #fff;
+        border: none;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background: #1e3d59;
+      }
+
+      .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #0b2a3a;
+        text-decoration: none;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="registration-container">
+      <h2 data-i18n="registration.heading">Teacher Registration</h2>
+      <form id="teacherRegistrationForm">
+        <div class="form-group">
+          <label for="fullName" data-i18n="registration.fullName"
+            >Full Name</label
+          >
+          <input type="text" id="fullName" name="fullName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email" data-i18n="registration.email"
+            >Email Address</label
+          >
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone" data-i18n="registration.phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
+
+        <div class="form-group">
+          <label for="school" data-i18n="registration.school"
+            >School / Organization</label
+          >
+          <input type="text" id="school" name="school" />
+        </div>
+
+        <div class="form-group">
+          <label for="subjects" data-i18n="registration.subjects"
+            >Subjects Taught</label
+          >
+          <input
+            type="text"
+            id="subjects"
+            name="subjects"
+            placeholder="Math, Science, etc."
+            data-i18n-placeholder="registration.subjectsPlaceholder"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="experience" data-i18n="registration.experience"
+            >Years of Experience</label
+          >
+          <select id="experience" name="experience" required>
+            <option value="" data-i18n="registration.select">Select...</option>
+            <option value="0-2" data-i18n="registration.exp0_2">
+              0-2 years
+            </option>
+            <option value="3-5" data-i18n="registration.exp3_5">
+              3-5 years
+            </option>
+            <option value="6-10" data-i18n="registration.exp6_10">
+              6-10 years
+            </option>
+            <option value="10+" data-i18n="registration.exp10plus">
+              10+ years
+            </option>
+          </select>
+        </div>
+
+        <button type="submit" data-i18n="registration.register">
+          Register
+        </button>
+      </form>
+
+      <a href="/index.html" class="back-link" data-i18n="registration.back"
+        >← Back to Home</a
+      >
+    </div>
+
+    <script src="https://unpkg.com/i18next@21.6.16/dist/umd/i18next.min.js"></script>
+    <script>
+      // Load translations and set language from localStorage
+      fetch("locales.json")
+        .then((res) => res.json())
+        .then((resources) => {
+          const lang = localStorage.getItem("i18nextLng") || "en";
+          i18next.init(
+            {
+              lng: lang,
+              debug: false,
+              resources,
+            },
+            function (err, t) {
+              updateContent();
+            }
+          );
+
+          function updateContent() {
+            document.querySelectorAll("[data-i18n]").forEach(function (el) {
+              el.innerHTML = i18next.t(el.getAttribute("data-i18n"));
+            });
+            // For placeholders
+            document
+              .querySelectorAll("[data-i18n-placeholder]")
+              .forEach(function (el) {
+                el.placeholder = i18next.t(
+                  el.getAttribute("data-i18n-placeholder")
+                );
+              });
+            // For select options
+            document
+              .querySelectorAll("option[data-i18n]")
+              .forEach(function (opt) {
+                opt.textContent = i18next.t(opt.getAttribute("data-i18n"));
+              });
+          }
+        });
+
+      document
+        .getElementById("teacherRegistrationForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = {
+            name: document.getElementById("fullName").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            school: document.getElementById("school").value,
+            subjects: document.getElementById("subjects").value,
+            experience: document.getElementById("experience").value,
+          };
+
+          // Store data in localStorage (for demo purpose)
+          let teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+          teachers.push(formData);
+          localStorage.setItem("teachers", JSON.stringify(teachers));
+
+          alert(
+            i18next.t("registration.success") ||
+              "Thank you for registering! We will contact you soon."
+          );
+          this.reset();
+        });
+    </script>
+  </body>
+</html>
